@@ -13,6 +13,8 @@ namespace FolhaDePonto.AutoMapper
             CreateMap<TimeMomentCreateDTO, TimeMomentBR>()
             .ForMember(dest => dest.DateTime, map => map.MapFrom(x => x.DataHora));
 
+            CreateMap<UserDTO, UserBR>().ReverseMap();
+
             CreateMap<IEnumerable<TimeMomentBR>, RegisterResponseDTO>()
                 .ForMember(dest => dest.Horarios, map => map.MapFrom(x => x.Select(x => x.DateTime.ToLongTimeString())))
                 .ForMember(dest => dest.Dia, map => map.MapFrom(x => x.FirstOrDefault().DateTime.Date.ToShortDateString()));

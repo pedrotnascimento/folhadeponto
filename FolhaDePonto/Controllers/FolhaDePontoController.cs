@@ -16,12 +16,18 @@ namespace FolhaDePonto.Controllers
         private readonly ILogger<FolhaDePontoController> _logger;
         private readonly IFolhaDePonto folhaDePonto;
         private readonly IMapper mapper;
+        private readonly IAuthentication authentication;
 
-        public FolhaDePontoController(ILogger<FolhaDePontoController> logger, IFolhaDePonto folhaDePonto, IMapper mapper)
+        public FolhaDePontoController(ILogger<FolhaDePontoController> logger,
+            IMapper mapper,
+            IFolhaDePonto folhaDePonto,
+            IAuthentication authentication
+            )
         {
             _logger = logger;
             this.folhaDePonto = folhaDePonto;
             this.mapper = mapper;
+            this.authentication = authentication;
         }
 
         [HttpPost("batidas")]
@@ -31,7 +37,9 @@ namespace FolhaDePonto.Controllers
             {
                 GetDateTime(timeMoment.DataHora);
                 TimeMomentBR data = mapper.Map<TimeMomentCreateDTO, TimeMomentBR>(timeMoment);
-                data.User = new UserBR { Name = "teste" };
+                UserDTO userDTO = GetSignedInUser();
+                var user = mapper.Map<UserDTO, UserBR>(userDTO);
+                data.User = user;
                 IEnumerable<TimeMomentBR> moments = folhaDePonto.ClockIn(data);
                 RegisterResponseDTO register = mapper.Map<IEnumerable<TimeMomentBR>, RegisterResponseDTO>(moments);
                 return new OkObjectResult(register) { StatusCode = 201 };
@@ -68,7 +76,9 @@ namespace FolhaDePonto.Controllers
             try
             {
                 TimeAllocationBR data = mapper.Map<AllocationCreateDTO, TimeAllocationBR>(allocation);
-                data.User = new UserBR { Name = "teste" };
+                UserDTO userDTO = GetSignedInUser();
+                var user = mapper.Map<UserDTO, UserBR>(userDTO);
+                data.User = user;
                 TimeAllocationBR result = folhaDePonto.AllocateHoursInProject(data);
                 AllocationCreateDTO resultReturn = mapper.Map<TimeAllocationBR, AllocationCreateDTO>(result);
                 return new OkObjectResult(resultReturn) { StatusCode = 201 };
@@ -96,11 +106,14 @@ namespace FolhaDePonto.Controllers
             {
                 var monthDateTime = GetDateTime(month);
 
+                
                 ReportBR reportGetDTO = new ReportBR
                 {
                     Month = monthDateTime,
-                    User = new UserBR { Name = "teste" }
                 };
+                UserDTO userDTO = GetSignedInUser();
+                var user = mapper.Map<UserDTO, UserBR>(userDTO);
+                reportGetDTO.User = user;
 
                 ReportDataBR? result = folhaDePonto.GetReport(reportGetDTO);
                 if (result == null)
@@ -115,6 +128,14 @@ namespace FolhaDePonto.Controllers
             {
                 return ReturnError(e, 400);
             }
+        }
+
+        private UserDTO GetSignedInUser()
+        {
+            // TODO: Implementar forma de autenticação
+            string? token = User?.Identity?.Name;
+            var user = authentication.GetSignedInUser(token);
+            return user;
         }
 
         private DateTime GetDateTime(string dateTimeStr)
