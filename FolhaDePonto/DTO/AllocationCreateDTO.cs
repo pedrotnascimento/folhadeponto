@@ -1,6 +1,6 @@
-﻿namespace FolhaDePonto.Entities
+﻿namespace FolhaDePonto.DTO
 {
-    public class AlocacaoDTO
+    public class AllocationCreateDTO
     {
         public DateTime Dia { get; set; }
         public string Tempo { get; set; }

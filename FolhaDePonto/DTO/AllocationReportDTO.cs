@@ -1,6 +1,6 @@
 ﻿namespace FolhaDePonto.DTO
 {
-    public class AlocacaoDTO
+    public class AllocationReportDTO
     {   
         public string Tempo { get; set; }
         public string NomeProjeto { get; set; }

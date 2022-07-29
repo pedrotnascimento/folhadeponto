@@ -10,7 +10,7 @@ namespace FolhaDePonto.Controllers
         private readonly ILogger<FolhaDePontoController> _logger;
 
         public FolhaDePontoController(ILogger<FolhaDePontoController> logger)
-        {
+        { 
             _logger = logger;
         }
 

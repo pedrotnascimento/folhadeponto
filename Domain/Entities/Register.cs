@@ -1,6 +1,6 @@
 ﻿namespace FolhaDePonto.Entities
 {
-    public class DayRegister
+    public class Register
     {
         public DateTime Date { get; set; }
         public IEnumerable<DateTime> Hours { get; set; }
