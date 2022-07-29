@@ -18,7 +18,7 @@ namespace FolhaDePonto.Services
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Register> ClockIn(TimeMoment dayMoment)
+        public Register ClockIn(TimeMoment dayMoment)
         {
             throw new NotImplementedException();
         }

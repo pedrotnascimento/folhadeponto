@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolhaDePonto", "FolhaDePont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{42B79EBB-5761-49DB-8521-72D578D1B8B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolhaDePontoTest", "FolhaDePontoTest\FolhaDePontoTest.csproj", "{A9AE31EC-8F3A-4F9A-8670-1E685915E1BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{42B79EBB-5761-49DB-8521-72D578D1B8B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42B79EBB-5761-49DB-8521-72D578D1B8B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42B79EBB-5761-49DB-8521-72D578D1B8B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9AE31EC-8F3A-4F9A-8670-1E685915E1BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9AE31EC-8F3A-4F9A-8670-1E685915E1BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9AE31EC-8F3A-4F9A-8670-1E685915E1BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9AE31EC-8F3A-4F9A-8670-1E685915E1BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
