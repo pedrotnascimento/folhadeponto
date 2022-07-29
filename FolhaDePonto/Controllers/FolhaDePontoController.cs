@@ -89,32 +89,27 @@ namespace FolhaDePonto.Controllers
 
 
         [HttpPost("folhas-de-ponto/{mes}")]
-        public ObjectResult Alocacao([FromQuery] string month)
+        public ObjectResult FolhaDePonto([FromQuery] string month)
         {
-            
+
             try
             {
                 var monthDateTime = GetDateTime(month);
 
-                
                 ReportBR reportGetDTO = new ReportBR
-                { 
-                    Month = monthDateTime, 
-                    User = new UserBR { Name = "teste" } 
+                {
+                    Month = monthDateTime,
+                    User = new UserBR { Name = "teste" }
                 };
-                
-                ReportDataBR result = folhaDePonto.GetReport(reportGetDTO);
+
+                ReportDataBR? result = folhaDePonto.GetReport(reportGetDTO);
+                if (result == null)
+                {
+                    return ReturnError(404, "Relatório não encontrado");
+                }
                 var reportResult = mapper.Map<ReportDataBR, ReportResponseDTO>(result);
-                
+
                 return new OkObjectResult(reportResult) { StatusCode = 201 };
-            }
-            catch (WeekendExceptions e)
-            {
-                return ReturnError(e, 403);
-            }
-            catch (TimeAllocationLimitException e)
-            {
-                return ReturnError(e, 400);
             }
             catch (Exception e)
             {
@@ -141,7 +136,14 @@ namespace FolhaDePonto.Controllers
         {
             _logger.LogError(e.ToString(), e.StackTrace);
             MessageResponseDTO messageDTO = new MessageResponseDTO { Mensagem = e.Message };
-            return new ObjectResult(messageDTO) { StatusCode = statusCode };
+            return StatusCode(statusCode, messageDTO);
+        }
+
+        private ObjectResult ReturnError(int statusCode, object? value)
+        {
+            _logger.LogError(value.ToString());
+            MessageResponseDTO messageDTO = new MessageResponseDTO { Mensagem = value.ToString() };
+            return StatusCode(statusCode, messageDTO);
         }
     }
 }

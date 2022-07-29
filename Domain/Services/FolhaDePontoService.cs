@@ -149,7 +149,7 @@ namespace BusinessRule.Services
             return dateTime;
         }
 
-        public ReportDataBR GetReport(ReportBR reportDTO)
+        public ReportDataBR? GetReport(ReportBR reportDTO)
         {
             DateTime month = reportDTO.Month;
             var result = new ReportDataBR
@@ -159,6 +159,10 @@ namespace BusinessRule.Services
             };
 
             var timeMomentsDAL = timeMomentRepository.QueryByUserIdAndMonth(reportDTO.User.Id, month);
+            if (!timeMomentsDAL.Any())
+            {
+                return null;
+            }
             var timeMoments = mapper.Map<List<TimeMomentDAL>, List<TimeMomentBR>>(timeMomentsDAL);
             result.TimeMoments = timeMoments;
 

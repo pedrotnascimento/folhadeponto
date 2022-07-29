@@ -8,6 +8,6 @@ namespace BusinessRule.Interfaces
     {
         IEnumerable<TimeMomentBR> ClockIn(TimeMomentBR dayMoment);
         TimeAllocationBR AllocateHoursInProject(TimeAllocationBR allocation);
-        ReportDataBR GetReport(ReportBR reportGetDTO);
+        ReportDataBR? GetReport(ReportBR reportGetDTO);
     }
 }
