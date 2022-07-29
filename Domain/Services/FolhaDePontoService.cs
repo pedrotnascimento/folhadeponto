@@ -12,7 +12,6 @@ namespace Domain.Services
         public readonly static int LIMIT_OF_MOMENT_PER_DAY = 4;
         private ILogger<FolhaDePontoService> logger;
         private ITimeMomentRepository timeMomentRepository;
-        private readonly FolhaDePontoContext context;
 
         public FolhaDePontoService(ILogger<FolhaDePontoService> _logger,
             ITimeMomentRepository timeMomentRepository)
@@ -23,7 +22,7 @@ namespace Domain.Services
 
         public IEnumerable<TimeAllocation> AllocateHoursInProject(TimeAllocation allocation)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException();   
         }
 
         public IEnumerable<TimeMoment> ClockIn(TimeMoment dayMoment)
@@ -42,6 +41,20 @@ namespace Domain.Services
                 throw new HoursLimitExceptions();
             }
 
+            if (timeMoments.Count == 2)
+            {
+                TimeSpan lunchTime = dayMoment.DateTime - timeMoments.LastOrDefault().DateTime;
+                if (lunchTime.Hours < 1)
+                {
+                    throw new LunchTimeLimitExceptions();
+                }
+            }
+            
+            if(dayMoment.DateTime.DayOfWeek == DayOfWeek.Sunday || dayMoment.DateTime.DayOfWeek == DayOfWeek.Saturday)
+            {
+                throw new WeekendExceptions();
+            }
+            
             timeMomentRepository.Create(dayMoment);
             timeMoments.Add(dayMoment);
             return timeMoments;
