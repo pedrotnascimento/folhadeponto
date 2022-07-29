@@ -10,13 +10,19 @@ namespace FolhaDePontoTest
 {
     public class FolhaDePontoServiceTest
     {
+        IFolhaDePonto folhaDePonto;
+        public FolhaDePontoServiceTest()
+        {
+            folhaDePonto = FolhaDePontoServiceArranje();
+        }
+
         [Theory]
-        [InlineData("2022-01-01T08:00:00")]
+        [InlineData("2022-01-01T12:00:00")]
+        [InlineData("2022-01-01T00:00:00")]
+        [InlineData("2022-01-20T23:59:59")]
         public void ShouldRegisterATimeMoment(string dateTimeStr)
         {
-            IFolhaDePonto folhaDePonto = FolhaDePontoServiceArranje();
             TimeMoment timeMoment = TimeMomentArranje(dateTimeStr);
-
             var hourPart = timeMoment.DateTime.ToLongTimeString();
 
             IEnumerable<TimeMoment> result = folhaDePonto.ClockIn(timeMoment);
@@ -25,14 +31,13 @@ namespace FolhaDePontoTest
         }
 
 
-
         [Theory]
-        [InlineData("2022-01-01T08:00:00")]
+        [InlineData("2022-01-01T12:00:00")]
+        [InlineData("2022-01-01T00:00:00")]
+        [InlineData("2022-01-01T23:00:00")]
         public void ShouldFailWhenRegisterATimeMomentThatAlreadyExists(string dateTimeStr)
         {
-            IFolhaDePonto folhaDePonto = FolhaDePontoServiceArranje();
             TimeMoment timeMoment = TimeMomentArranje(dateTimeStr);
-
             folhaDePonto.ClockIn(timeMoment);
 
             var exceptionCall = () => folhaDePonto.ClockIn(timeMoment);
@@ -41,10 +46,11 @@ namespace FolhaDePontoTest
         }
 
         [Theory]
-        [InlineData("2022-01-01T08:00:00")]
+        [InlineData("2022-01-01T12:00:00")]
+        [InlineData("2022-01-01T00:00:00")]
+        [InlineData("2022-01-01T16:59:59")]
         public void ShouldFailWhenExceedsTimeMomentRegister(string dateTimeStr)
         {
-            IFolhaDePonto folhaDePonto = FolhaDePontoServiceArranje();
             TimeMoment timeMomentExtra = SeveralTimeMomentArranje(dateTimeStr, folhaDePonto);
 
             var exceptionCall = () => folhaDePonto.ClockIn(timeMomentExtra);
@@ -52,6 +58,7 @@ namespace FolhaDePontoTest
             Assert.Throws<HoursLimitExceptions>(exceptionCall);
         }
 
+        #region Auxiliar methods
         private TimeMoment SeveralTimeMomentArranje(string dateTimeStr, IFolhaDePonto folhaDePonto)
         {
             TimeMoment timeMoment = TimeMomentArranje(dateTimeStr);
@@ -60,7 +67,7 @@ namespace FolhaDePontoTest
             for (var i = 1; i < FolhaDePontoService.LIMIT_OF_MOMENT_PER_DAY; i++)
             {
                 TimeMoment timeMomentRepeated = new TimeMoment { 
-                    DateTime = timeMoment.DateTime.AddHours(i), 
+                    DateTime = timeMoment.DateTime.AddMinutes(i), 
                     UserId = timeMoment.UserId 
                 };
                 folhaDePonto.ClockIn(timeMomentRepeated);
@@ -93,5 +100,6 @@ namespace FolhaDePontoTest
             timeMoment.User = new User { Name = "teste" };
             return timeMoment;
         }
+        #endregion
     }
 }

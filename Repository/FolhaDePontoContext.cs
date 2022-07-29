@@ -20,8 +20,8 @@ namespace Repository
             DbPath = System.IO.Path.Join(path, "FolhaDePonto.db");
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite($"Data Source={DbPath}");
+        //protected override void OnConfiguring(DbContextOptionsBuilder options)
+        //    => options.UseSqlite($"Data Source=:memory:");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

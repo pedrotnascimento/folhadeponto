@@ -10,15 +10,17 @@ namespace FolhaDePontoTest
         public SharedDatabaseFixture()
         {
             this.connection = new SqliteConnection("DataSource=:memory:");
+            this.connection.Open();
         }
         public void Dispose() => this.connection.Dispose();
         public FolhaDePontoContext CreateContext()
         {
             var result = new FolhaDePontoContext(new DbContextOptionsBuilder<FolhaDePontoContext>()
                 .UseSqlite(this.connection)
-                .Options);
+                .Options
+                );
             result.Database.EnsureCreated();
-            this.connection.Open();
+            
             return result;
         }
     }

@@ -17,7 +17,6 @@ namespace Domain.Services
         public FolhaDePontoService(ILogger<FolhaDePontoService> _logger,
             ITimeMomentRepository timeMomentRepository)
         {
-            this.context = context;
             logger = _logger;
             this.timeMomentRepository = timeMomentRepository;
         }
@@ -30,7 +29,8 @@ namespace Domain.Services
         public IEnumerable<TimeMoment> ClockIn(TimeMoment dayMoment)
         {
             var timeMoments = timeMomentRepository.QueryByUserIdAndDate(dayMoment.UserId, dayMoment.DateTime.Date);
-            var hasAlreadyTimeMomentInHour = timeMoments.Any(x => x.DateTime.Hour == dayMoment.DateTime.Hour);
+            var hasAlreadyTimeMomentInHour = timeMoments.Any(x => x.DateTime.Hour == dayMoment.DateTime.Hour &&
+                    x.DateTime.Minute == dayMoment.DateTime.Minute);
             if (hasAlreadyTimeMomentInHour)
             {
                 throw new HourAlreadyExistsException();
