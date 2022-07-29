@@ -1,10 +1,12 @@
-﻿using FolhaDePonto.Entities;
+﻿
 
-namespace FolhaDePonto.Interfaces
+using Domain.Entities;
+
+namespace Domain.Interfaces
 {
     public interface IFolhaDePonto
     {
-        Register ClockIn(TimeMoment dayMoment);
+        IEnumerable<TimeMoment> ClockIn(TimeMoment dayMoment);
         IEnumerable<TimeAllocation> AllocateHoursInProject(TimeAllocation allocation);
     }
 }

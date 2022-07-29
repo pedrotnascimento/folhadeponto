@@ -3,7 +3,7 @@
     public class HourAlreadyExistsException: Exception
     {
 
-        HourAlreadyExistsException(): base("Horários já registrado") { 
+        public HourAlreadyExistsException(): base("Horários já registrado") { 
         }
     }
 }

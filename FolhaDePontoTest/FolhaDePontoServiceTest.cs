@@ -1,9 +1,10 @@
 using Moq;
 using Microsoft.Extensions.Logging;
-using FolhaDePonto.Services;
-using FolhaDePonto.Interfaces;
-using FolhaDePonto.Entities;
 using FolhaDePonto.Exceptions.FolhaDePontoExceptions;
+using Domain.Entities;
+using Domain.Services;
+using Domain.Interfaces;
+using Repository.Repositories;
 
 namespace FolhaDePontoTest
 {
@@ -13,24 +14,23 @@ namespace FolhaDePontoTest
         [InlineData("2022-01-01T08:00:00")]
         public void ShouldRegisterATimeMoment(string dateTimeStr)
         {
-            Mock<ILogger<FolhaDePontoService>> mockLogger = new Mock<ILogger<FolhaDePontoService>>();
-            IFolhaDePonto folhaDePonto = new FolhaDePontoService(mockLogger.Object);
+            IFolhaDePonto folhaDePonto = FolhaDePontoServiceArranje();
             TimeMoment timeMoment = TimeMomentArranje(dateTimeStr);
 
             var hourPart = timeMoment.DateTime.ToLongTimeString();
 
-            var result = folhaDePonto.ClockIn(timeMoment);
+            IEnumerable<TimeMoment> result = folhaDePonto.ClockIn(timeMoment);
 
-            Assert.NotNull(result.Hours.FirstOrDefault(x => x.ToLongTimeString() == hourPart));
+            Assert.NotNull(result.FirstOrDefault(x => x.DateTime.ToLongTimeString() == hourPart));
         }
 
-        
+
+
         [Theory]
         [InlineData("2022-01-01T08:00:00")]
         public void ShouldFailWhenRegisterATimeMomentThatAlreadyExists(string dateTimeStr)
         {
-            Mock<ILogger<FolhaDePontoService>> mockLogger = new Mock<ILogger<FolhaDePontoService>>();
-            IFolhaDePonto folhaDePonto = new FolhaDePontoService(mockLogger.Object);
+            IFolhaDePonto folhaDePonto = FolhaDePontoServiceArranje();
             TimeMoment timeMoment = TimeMomentArranje(dateTimeStr);
 
             folhaDePonto.ClockIn(timeMoment);
@@ -44,24 +44,45 @@ namespace FolhaDePontoTest
         [InlineData("2022-01-01T08:00:00")]
         public void ShouldFailWhenExceedsTimeMomentRegister(string dateTimeStr)
         {
-            Mock<ILogger<FolhaDePontoService>> mockLogger = new Mock<ILogger<FolhaDePontoService>>();
-            IFolhaDePonto folhaDePonto = new FolhaDePontoService(mockLogger.Object);
+            IFolhaDePonto folhaDePonto = FolhaDePontoServiceArranje();
+            TimeMoment timeMomentExtra = SeveralTimeMomentArranje(dateTimeStr, folhaDePonto);
+
+            var exceptionCall = () => folhaDePonto.ClockIn(timeMomentExtra);
+
+            Assert.Throws<HoursLimitExceptions>(exceptionCall);
+        }
+
+        private TimeMoment SeveralTimeMomentArranje(string dateTimeStr, IFolhaDePonto folhaDePonto)
+        {
             TimeMoment timeMoment = TimeMomentArranje(dateTimeStr);
 
             folhaDePonto.ClockIn(timeMoment);
+            for (var i = 1; i < FolhaDePontoService.LIMIT_OF_MOMENT_PER_DAY; i++)
+            {
+                TimeMoment timeMomentRepeated = new TimeMoment { 
+                    DateTime = timeMoment.DateTime.AddHours(i), 
+                    UserId = timeMoment.UserId 
+                };
+                folhaDePonto.ClockIn(timeMomentRepeated);
+            }
 
-            timeMoment.DateTime = timeMoment.DateTime.AddHours(1);
-            folhaDePonto.ClockIn(timeMoment);
-            
-            timeMoment.DateTime = timeMoment.DateTime.AddHours(1);
-            folhaDePonto.ClockIn(timeMoment);
-            
-            timeMoment.DateTime = timeMoment.DateTime.AddHours(1);
-            folhaDePonto.ClockIn(timeMoment);
+            TimeMoment timeMomentExtra = new TimeMoment { 
+                DateTime = timeMoment.DateTime.AddHours(FolhaDePontoService.LIMIT_OF_MOMENT_PER_DAY), 
+                UserId = timeMoment.UserId 
+            };
+            timeMomentExtra.UserId = timeMoment.UserId;
+            return timeMomentExtra;
+        }
 
-            var exceptionCall = () => folhaDePonto.ClockIn(timeMoment);
+        private static IFolhaDePonto FolhaDePontoServiceArranje()
+        {
+            Mock<ILogger<FolhaDePontoService>> mockLogger = new Mock<ILogger<FolhaDePontoService>>();
+            SharedDatabaseFixture sharedDatabaseFixture = new SharedDatabaseFixture();
+            var context = sharedDatabaseFixture.CreateContext();
 
-            Assert.Throws<TimeAllocationLimitException>(exceptionCall);
+            var timeMomentRepository = new TimeMomentRepository(context);
+            IFolhaDePonto folhaDePonto = new FolhaDePontoService(mockLogger.Object, timeMomentRepository);
+            return folhaDePonto;
         }
 
         private TimeMoment TimeMomentArranje(string dateTimeStr)
@@ -69,6 +90,7 @@ namespace FolhaDePontoTest
             TimeMoment timeMoment = new TimeMoment();
             DateTime dateTime = DateTime.Parse(dateTimeStr);
             timeMoment.DateTime = dateTime;
+            timeMoment.User = new User { Name = "teste" };
             return timeMoment;
         }
     }
