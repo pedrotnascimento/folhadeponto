@@ -27,9 +27,10 @@ namespace Repository
         {
             modelBuilder.Entity<TimeMoment>()
                 .HasKey(p => new { p.UserId, p.DateTime });
-                
-            modelBuilder.Entity<TimeAllocation>().HasNoKey();
-                
+
+            modelBuilder.Entity<TimeAllocation>().HasKey(
+                x => new { x.UserId, x.ProjectName, x.Date });
+
         }
 
     }

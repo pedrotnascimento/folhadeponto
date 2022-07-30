@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolhaDePonto", "FolhaDePonto\FolhaDePonto.csproj", "{E51F4F70-2B8D-4824-B35E-84662B846E80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolhaDePonto", "FolhaDePonto\FolhaDePonto.csproj", "{E51F4F70-2B8D-4824-B35E-84662B846E80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessRule", "Domain\BusinessRule.csproj", "{42B79EBB-5761-49DB-8521-72D578D1B8B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessRule", "Domain\BusinessRule.csproj", "{42B79EBB-5761-49DB-8521-72D578D1B8B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolhaDePontoTest", "FolhaDePontoTest\FolhaDePontoTest.csproj", "{A9AE31EC-8F3A-4F9A-8670-1E685915E1BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FolhaDePontoTest", "FolhaDePontoTest\FolhaDePontoTest.csproj", "{A9AE31EC-8F3A-4F9A-8670-1E685915E1BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{B99374D0-1F16-4A20-BD51-2ED6E7301A42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{B99374D0-1F16-4A20-BD51-2ED6E7301A42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{812451E0-FF71-4D60-96E6-8387E8025819}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{812451E0-FF71-4D60-96E6-8387E8025819}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

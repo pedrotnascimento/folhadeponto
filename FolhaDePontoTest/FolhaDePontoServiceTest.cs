@@ -35,7 +35,7 @@ namespace FolhaDePontoTest
         [InlineData("2022-01-03T09:00:00", "2022-01-03T12:00:00", "2022-01-03T13:00:00", "2022-01-03T17:00:00")]
         [InlineData("2022-01-03T00:00:00", "2022-01-03T00:01:00", "2022-01-03T23:58:00", "2022-01-03T23:59:00")]
         [InlineData("2022-01-03T00:00:00", "2022-01-03T22:58:00", "2022-01-03T23:58:00", "2022-01-03T23:59:00")]
-        public void ShouldRegisterAllTimeMoments(string start, string lunchStart, string lunchEnd, string end )
+        public void ShouldRegisterAllTimeMoments(string start, string lunchStart, string lunchEnd, string end)
         {
             TimeMoment startMoment = TimeMomentArranje(start);
             folhaDePonto.ClockIn(startMoment);
@@ -50,16 +50,7 @@ namespace FolhaDePontoTest
             TimeMoment endMoment = CreateMomenWithUser(end, userId);
             IEnumerable<TimeMoment>? result = folhaDePonto.ClockIn(endMoment);
 
-            Assert.True(result.Count()==4);
-        }
-
-        private  TimeMoment CreateMomenWithUser(string dateTimeStr, int userId)
-        {
-            return new TimeMoment
-            {
-                UserId = userId,
-                DateTime = DateTime.Parse(dateTimeStr),
-            };
+            Assert.True(result.Count() == 4);
         }
 
         [Theory]
@@ -116,16 +107,43 @@ namespace FolhaDePontoTest
             };
             folhaDePonto.ClockIn(lunchStartTimeMoment);
 
-            TimeMoment lunchEndTimeMoment = new TimeMoment { 
+            TimeMoment lunchEndTimeMoment = new TimeMoment
+            {
                 UserId = lunchStartTimeMoment.UserId,
-                DateTime = DateTime.Parse(lunchEnd) 
+                DateTime = DateTime.Parse(lunchEnd)
             };
             var exceptionCall = () => folhaDePonto.ClockIn(lunchEndTimeMoment);
 
             Assert.Throws<LunchTimeLimitExceptions>(exceptionCall);
         }
 
+        [Theory]
+        [InlineData("2022-01-03T00:00:00", "0001-01-01T00:01:00", "Projeto Teste")]
+        public void ShouldCreateAllocationHoursInProject(string dateTimeStr, string duration, string projectName)
+        {
+            SeveralTimeMomentArranje(dateTimeStr, folhaDePonto);
+            var timeDuration = DateTime.Parse(duration);
+            var timeAllocation = new TimeAllocation
+            {
+                Date = DateTime.Parse(dateTimeStr),
+                TimeDuration = timeDuration,
+                ProjectName = projectName,
+                User = new User { Name = "teste", Id = 0 }
+            };
+            var result = folhaDePonto.AllocateHoursInProject(timeAllocation);
+            Assert.True(result.TimeDuration == timeDuration);
+        }
+
         #region Auxiliar methods
+        private TimeMoment CreateMomenWithUser(string dateTimeStr, int userId)
+        {
+            return new TimeMoment
+            {
+                UserId = userId,
+                DateTime = DateTime.Parse(dateTimeStr),
+            };
+        }
+
         private TimeMoment SeveralTimeMomentArranje(string dateTimeStr, IFolhaDePonto folhaDePonto)
         {
             TimeMoment timeMoment = TimeMomentArranje(dateTimeStr);
@@ -133,16 +151,18 @@ namespace FolhaDePontoTest
             folhaDePonto.ClockIn(timeMoment);
             for (var i = 1; i < FolhaDePontoService.LIMIT_OF_MOMENT_PER_DAY; i++)
             {
-                TimeMoment timeMomentRepeated = new TimeMoment { 
-                    DateTime = timeMoment.DateTime.AddHours(i), 
-                    UserId = timeMoment.UserId 
+                TimeMoment timeMomentRepeated = new TimeMoment
+                {
+                    DateTime = timeMoment.DateTime.AddHours(i),
+                    UserId = timeMoment.UserId
                 };
                 folhaDePonto.ClockIn(timeMomentRepeated);
             }
 
-            TimeMoment timeMomentExtra = new TimeMoment { 
-                DateTime = timeMoment.DateTime.AddHours(FolhaDePontoService.LIMIT_OF_MOMENT_PER_DAY), 
-                UserId = timeMoment.UserId 
+            TimeMoment timeMomentExtra = new TimeMoment
+            {
+                DateTime = timeMoment.DateTime.AddHours(FolhaDePontoService.LIMIT_OF_MOMENT_PER_DAY),
+                UserId = timeMoment.UserId
             };
             timeMomentExtra.UserId = timeMoment.UserId;
             return timeMomentExtra;
@@ -155,7 +175,8 @@ namespace FolhaDePontoTest
             var context = sharedDatabaseFixture.CreateContext();
 
             var timeMomentRepository = new TimeMomentRepository(context);
-            IFolhaDePonto folhaDePonto = new FolhaDePontoService(mockLogger.Object, timeMomentRepository);
+            var timeAllocationRepository= new TimeAllocationRepository(context);
+            IFolhaDePonto folhaDePonto = new FolhaDePontoService(mockLogger.Object, timeMomentRepository, timeAllocationRepository);
             return folhaDePonto;
         }
 
