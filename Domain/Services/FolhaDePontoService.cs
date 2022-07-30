@@ -1,43 +1,55 @@
-﻿using Domain.Entities;
-using Domain.Interfaces;
+﻿using AutoMapper;
+using BusinessRule.Domain;
+using BusinessRule.Exceptions.FolhaDePontoExceptions;
+using BusinessRule.Interfaces;
 using FolhaDePonto.Exceptions.FolhaDePontoExceptions;
 using Microsoft.Extensions.Logging;
 using Repository;
+using Repository.DataAccessLayer;
 using Repository.RepositoryInterfaces;
 
-namespace Domain.Services
+namespace BusinessRule.Services
 {
     public class FolhaDePontoService : IFolhaDePonto
     {
         public readonly static int LIMIT_OF_MOMENT_PER_DAY = 4;
         private ILogger<FolhaDePontoService> logger;
+        private IMapper mapper;
         private ITimeMomentRepository timeMomentRepository;
         private ITimeAllocationRepository timeAllocationRepository;
 
         public FolhaDePontoService(ILogger<FolhaDePontoService> _logger,
+            IMapper mapper,
             ITimeMomentRepository timeMomentRepository,
             ITimeAllocationRepository timeAllocationRepository
             )
         {
             logger = _logger;
+            this.mapper = mapper;
             this.timeMomentRepository = timeMomentRepository;
             this.timeAllocationRepository = timeAllocationRepository;
         }
 
 
-        public IEnumerable<TimeMoment> ClockIn(TimeMoment dayMoment)
+        public IEnumerable<TimeMomentBR> ClockIn(TimeMomentBR dayMoment)
         {
-            var timeMoments = timeMomentRepository.QueryByUserIdAndDate(dayMoment.UserId, dayMoment.DateTime.Date);
-            var hasAlreadyTimeMomentInHour = timeMoments.Any(x => x.DateTime.Hour == dayMoment.DateTime.Hour &&
-                    x.DateTime.Minute == dayMoment.DateTime.Minute);
-            ValidateClockIn(dayMoment, timeMoments, hasAlreadyTimeMomentInHour);
+            var timeMomentsResult = timeMomentRepository.QueryByUserIdAndDate(dayMoment.UserId, dayMoment.DateTime.Date);
+            var timeMoments = mapper.Map<IList<TimeMomentDAL>, IList<TimeMomentBR>>(timeMomentsResult);
 
-            timeMomentRepository.Create(dayMoment);
+            var hasAlreadyTimeMomentInHour = timeMomentsResult.Any(x => x.DateTime.Hour == dayMoment.DateTime.Hour &&
+                    x.DateTime.Minute == dayMoment.DateTime.Minute);
+            
+
+            ValidateClockIn(dayMoment, timeMoments, hasAlreadyTimeMomentInHour);
+            
+            var dayMomentForCreation = mapper.Map<TimeMomentBR, TimeMomentDAL>(dayMoment);
+            
+            timeMomentRepository.Create(dayMomentForCreation);
             timeMoments.Add(dayMoment);
             return timeMoments;
         }
 
-        private void ValidateClockIn(TimeMoment dayMoment, IList<TimeMoment> timeMoments, bool hasAlreadyTimeMomentInHour)
+        private void ValidateClockIn(TimeMomentBR dayMoment, IList<TimeMomentBR> timeMoments, bool hasAlreadyTimeMomentInHour)
         {
             if (hasAlreadyTimeMomentInHour)
             {
@@ -65,26 +77,27 @@ namespace Domain.Services
             }
         }
 
-        public TimeAllocation AllocateHoursInProject(TimeAllocation allocation)
+        public TimeAllocationBR AllocateHoursInProject(TimeAllocationBR allocation)
         {
 
             SanitizeTimeAllocation(allocation);
             ValidateAllocation(allocation);
 
             var timeAllocationOverall = timeAllocationRepository.GetByDate(allocation.Date);
+            var allocationForCreate = mapper.Map<TimeAllocationBR, TimeAllocationDAL>(allocation);
             if (timeAllocationOverall != null)
             {
-                timeAllocationRepository.Update(allocation);
+                timeAllocationRepository.Update(allocationForCreate);
             }
             else
             {
-                timeAllocationRepository.Create(allocation);
+                timeAllocationRepository.Create(allocationForCreate);
             }
 
             return allocation;
         }
 
-        private void ValidateAllocation(TimeAllocation allocation)
+        private void ValidateAllocation(TimeAllocationBR allocation)
         {
             var hoursWorkedInDate = TimeWorkedInDate(allocation.UserId, allocation.Date);
 
@@ -100,7 +113,7 @@ namespace Domain.Services
             }
         }
 
-        private static void SanitizeTimeAllocation(TimeAllocation allocation)
+        private static void SanitizeTimeAllocation(TimeAllocationBR allocation)
         {
             allocation.Date = allocation.Date.Date;
         }
@@ -128,5 +141,9 @@ namespace Domain.Services
             return dateTime;
         }
 
+        public TimeAllocationBR GetReport(ReportBR reportGetDTO)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

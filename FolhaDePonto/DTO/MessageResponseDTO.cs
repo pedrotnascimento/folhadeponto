@@ -1,6 +1,6 @@
 ﻿namespace FolhaDePonto.DTO
 {
-    public class MessageDTO
+    public class MessageResponseDTO
     {
         public string Mensagem { get; set; }
     }

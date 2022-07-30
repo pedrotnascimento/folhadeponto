@@ -1,8 +1,7 @@
 using AutoMapper;
-using Domain.Entities;
-using Domain.Interfaces;
-using Domain.Services;
-using FolhaDePonto;
+using BusinessRule.Interfaces;
+using BusinessRule.Services;
+using FolhaDePonto.AutoMapper;
 using FolhaDePonto.DTO;
 using Microsoft.EntityFrameworkCore;
 using Repository;
@@ -32,12 +31,12 @@ builder.Services.AddDbContext<FolhaDePontoContext>(options =>
 
 
 #region AutoMapper
-var mapperConfiguration = new MapperConfiguration(cfg =>
-{
-    cfg.CreateMap<TimeMomentCreateDTO, TimeMoment>().ForMember(dst => dst.DateTime, map => map.MapFrom(x => x.DataHora));
-});
-var mapper = mapperConfiguration.CreateMapper();
-builder.Services.AddAutoMapper(typeof(AutoMapperProfiler));
+
+builder.Services.AddAutoMapper(
+    typeof(DTOtoBRProfileMapper),
+    typeof(BRtoDALProfileMapper),
+    typeof(DALtoTableProfileMapper)
+    );
 #endregion
 
 var app = builder.Build();

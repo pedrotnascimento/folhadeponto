@@ -1,15 +1,11 @@
-﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Repository.DataAccessLayer;
+
 
 namespace Repository.RepositoryInterfaces
 {
     public interface ITimeMomentRepository
     {
-        void Create(TimeMoment timeMoment);
-        IList<TimeMoment> QueryByUserIdAndDate(int userId, DateTime date);
+        void Create(TimeMomentDAL timeMoment);
+        IList<TimeMomentDAL> QueryByUserIdAndDate(int userId, DateTime date);
     }
 }

@@ -1,9 +1,9 @@
-﻿namespace Domain.Entities
+﻿namespace Repository.DataAccessLayer
 {
-    public class TimeAllocation
+    public class TimeAllocationDAL
     {
         public int UserId { get; set; }
-        public User User { get; set; }
+        public UserDAL User { get; set; }
         public DateTime Date { get; set; }
         public DateTime TimeDuration { get; set; }
         public string ProjectName { get; set; }

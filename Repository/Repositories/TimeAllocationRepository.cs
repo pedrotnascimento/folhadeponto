@@ -1,39 +1,39 @@
-﻿using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Repository.DataAccessLayer;
 using Repository.RepositoryInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Repository.Tables;
 
 namespace Repository.Repositories
 {
     public class TimeAllocationRepository : ITimeAllocationRepository
     {
         private readonly FolhaDePontoContext context;
+        private readonly IMapper mapper;
 
-        public TimeAllocationRepository(FolhaDePontoContext context)
+        public TimeAllocationRepository(FolhaDePontoContext context, IMapper mapper)
         {
             this.context = context;
+            this.mapper = mapper;
         }
 
-        public TimeAllocation? GetByDate(DateTime dateTime)
+        public TimeAllocationDAL? GetByDate(DateTime dateTime)
         {
-            var ret = this.context.TimeAllocations.FirstOrDefault(x => x.Date == dateTime);
+            var result = this.context.TimeAllocations.FirstOrDefault(x => x.Date == dateTime);
+            var ret= mapper.Map<TimeAllocation, TimeAllocationDAL>(result);
             return ret;
         }
 
-        public void Create(TimeAllocation timeAlocation)
+        public void Create(TimeAllocationDAL timeAlocation)
         {
-            this.context.TimeAllocations.Add(timeAlocation);
+            var instance = mapper.Map<TimeAllocationDAL, TimeAllocation>(timeAlocation);
+            this.context.TimeAllocations.Add(instance);
             context.SaveChanges();
         }
 
-        public void Update(TimeAllocation timeAlocation)
+        public void Update(TimeAllocationDAL timeAlocation)
         {
-
-            this.context.TimeAllocations.Update(timeAlocation);
+            var instance = mapper.Map<TimeAllocationDAL, TimeAllocation>(timeAlocation);
+            this.context.TimeAllocations.Update(instance);
 
             context.SaveChanges();
         }

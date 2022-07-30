@@ -1,6 +1,7 @@
 using AutoMapper;
-using Domain.Entities;
-using Domain.Interfaces;
+using BusinessRule.Domain;
+using BusinessRule.Exceptions.FolhaDePontoExceptions;
+using BusinessRule.Interfaces;
 using FolhaDePonto.DTO;
 using FolhaDePonto.Exceptions.FolhaDePontoExceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -29,10 +30,10 @@ namespace FolhaDePonto.Controllers
             try
             {
                 GetDateTime(timeMoment.DataHora);
-                TimeMoment data = mapper.Map<TimeMomentCreateDTO, TimeMoment>(timeMoment);
-                data.User = new User { Name = "teste" };
-                IEnumerable<TimeMoment> moments = folhaDePonto.ClockIn(data);
-                RegisterDTO register = mapper.Map<IEnumerable<TimeMoment>, RegisterDTO>(moments);
+                TimeMomentBR data = mapper.Map<TimeMomentCreateDTO, TimeMomentBR>(timeMoment);
+                data.User = new UserBR { Name = "teste" };
+                IEnumerable<TimeMomentBR> moments = folhaDePonto.ClockIn(data);
+                RegisterResponseDTO register = mapper.Map<IEnumerable<TimeMomentBR>, RegisterResponseDTO>(moments);
                 return new OkObjectResult(register) { StatusCode = 201 };
             }
             catch (WeekendExceptions e)
@@ -66,10 +67,10 @@ namespace FolhaDePonto.Controllers
         {
             try
             {
-                TimeAllocation data = mapper.Map<AllocationCreateDTO, TimeAllocation>(allocation);
-                data.User = new User { Name = "teste" };
-                TimeAllocation result = folhaDePonto.AllocateHoursInProject(data);
-                AllocationCreateDTO resultReturn = mapper.Map<TimeAllocation, AllocationCreateDTO>(result);
+                TimeAllocationBR data = mapper.Map<AllocationCreateDTO, TimeAllocationBR>(allocation);
+                data.User = new UserBR { Name = "teste" };
+                TimeAllocationBR result = folhaDePonto.AllocateHoursInProject(data);
+                AllocationCreateDTO resultReturn = mapper.Map<TimeAllocationBR, AllocationCreateDTO>(result);
                 return new OkObjectResult(resultReturn) { StatusCode = 201 };
             }
             catch (WeekendExceptions e)
@@ -86,7 +87,41 @@ namespace FolhaDePonto.Controllers
             }
         }
 
-        private void GetDateTime(string dateTimeStr)
+
+        [HttpPost("folhas-de-ponto/{mes}")]
+        public ObjectResult Alocacao([FromQuery] string month)
+        {
+            
+            try
+            {
+                var monthDateTime = GetDateTime(month);
+
+                
+                ReportBR reportGetDTO = new ReportBR
+                { 
+                    Month = monthDateTime, 
+                    User = new UserBR { Name = "teste" } 
+                };
+                
+                TimeAllocationBR result = folhaDePonto.GetReport(reportGetDTO);
+                AllocationCreateDTO resultReturn = mapper.Map<TimeAllocationBR, AllocationCreateDTO>(result);
+                return new OkObjectResult(resultReturn) { StatusCode = 201 };
+            }
+            catch (WeekendExceptions e)
+            {
+                return ReturnError(e, 403);
+            }
+            catch (TimeAllocationLimitException e)
+            {
+                return ReturnError(e, 400);
+            }
+            catch (Exception e)
+            {
+                return ReturnError(e, 400);
+            }
+        }
+
+        private DateTime GetDateTime(string dateTimeStr)
         {
             if (String.IsNullOrWhiteSpace(dateTimeStr))
             {
@@ -97,12 +132,14 @@ namespace FolhaDePonto.Controllers
             {
                 throw new InvalidDataException("Data e hora em formato inválido");
             }
+            return dateTime;
         }
+
 
         private ObjectResult ReturnError(Exception e, int statusCode)
         {
             _logger.LogError(e.ToString(), e.StackTrace);
-            MessageDTO messageDTO = new MessageDTO { Mensagem = e.Message };
+            MessageResponseDTO messageDTO = new MessageResponseDTO { Mensagem = e.Message };
             return new ObjectResult(messageDTO) { StatusCode = statusCode };
         }
     }

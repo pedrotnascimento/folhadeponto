@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities
+﻿namespace Repository.Tables
 {
     public class TimeMoment
     {

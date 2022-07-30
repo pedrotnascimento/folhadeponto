@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\BusinessRule.csproj" />
+    <ProjectReference Include="..\FolhaDePonto\FolhaDePonto.csproj" />
   </ItemGroup>
 
 </Project>

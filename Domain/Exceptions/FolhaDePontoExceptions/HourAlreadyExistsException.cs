@@ -1,4 +1,4 @@
-﻿namespace FolhaDePonto.Exceptions.FolhaDePontoExceptions
+﻿namespace BusinessRule.Exceptions.FolhaDePontoExceptions
 {
     public class HourAlreadyExistsException: Exception
     {

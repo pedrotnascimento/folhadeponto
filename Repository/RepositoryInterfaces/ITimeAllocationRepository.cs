@@ -1,16 +1,12 @@
-﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Repository.DataAccessLayer;
+using Repository.Tables;
 
 namespace Repository.RepositoryInterfaces
 {
     public interface ITimeAllocationRepository
     {
-        void Create(TimeAllocation timeAlocation);
-        TimeAllocation? GetByDate(DateTime dateTime);
-        void Update(TimeAllocation timeAlocation);
+        void Create(TimeAllocationDAL timeAlocation);
+        TimeAllocationDAL? GetByDate(DateTime dateTime);
+        void Update(TimeAllocationDAL timeAlocation);
     }
 }

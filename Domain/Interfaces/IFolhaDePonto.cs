@@ -1,12 +1,13 @@
 ﻿
 
-using Domain.Entities;
+using BusinessRule.Domain;
 
-namespace Domain.Interfaces
+namespace BusinessRule.Interfaces
 {
     public interface IFolhaDePonto
     {
-        IEnumerable<TimeMoment> ClockIn(TimeMoment dayMoment);
-        TimeAllocation AllocateHoursInProject(TimeAllocation allocation);
+        IEnumerable<TimeMomentBR> ClockIn(TimeMomentBR dayMoment);
+        TimeAllocationBR AllocateHoursInProject(TimeAllocationBR allocation);
+        TimeAllocationBR GetReport(ReportBR reportGetDTO);
     }
 }
