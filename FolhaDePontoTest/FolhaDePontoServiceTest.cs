@@ -6,7 +6,6 @@ using Domain.Services;
 using Domain.Interfaces;
 using Repository.Repositories;
 using Repository;
-using Repository.RepositoryInterfaces;
 
 namespace FolhaDePontoTest
 {
