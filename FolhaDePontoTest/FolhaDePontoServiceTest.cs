@@ -5,15 +5,23 @@ using Domain.Entities;
 using Domain.Services;
 using Domain.Interfaces;
 using Repository.Repositories;
+using Repository;
+using Repository.RepositoryInterfaces;
 
 namespace FolhaDePontoTest
 {
     public class FolhaDePontoServiceTest
     {
+        private readonly DateTime defaultDateTime = new DateTime(2022,1,3,0,0,0);
         IFolhaDePonto folhaDePonto;
+        User testUser;
+        FolhaDePontoContext context;
         public FolhaDePontoServiceTest()
         {
-            folhaDePonto = FolhaDePontoServiceArranje();
+            context = CreateContext();
+            folhaDePonto = FolhaDePontoServiceArranje(context);
+            CreateTestUser(context);
+
         }
 
         [Theory]
@@ -118,23 +126,64 @@ namespace FolhaDePontoTest
         }
 
         [Theory]
-        [InlineData("2022-01-03T00:00:00", "0001-01-01T00:01:00", "Projeto Teste")]
-        public void ShouldCreateAllocationHoursInProject(string dateTimeStr, string duration, string projectName)
+        [InlineData( 0.1, 4)]
+        [InlineData( 4, 4)]
+        [InlineData( 8, 8)]
+        [InlineData( 20,20)]
+        public void ShouldCreateAllocationHoursInProject(double hoursToAllocate, double hoursWorked)
         {
-            SeveralTimeMomentArranje(dateTimeStr, folhaDePonto);
-            var timeDuration = DateTime.Parse(duration);
+            BuildTimeMomentFullJourney(hoursWorked);
+
+            var timeDuration = new DateTime(1, 1, 1, 0, 0, 0).AddHours(hoursToAllocate);
             var timeAllocation = new TimeAllocation
             {
-                Date = DateTime.Parse(dateTimeStr),
+                Date = defaultDateTime,
                 TimeDuration = timeDuration,
-                ProjectName = projectName,
-                User = new User { Name = "teste", Id = 0 }
+                ProjectName = "Any Project Name",
+                UserId = testUser.Id
             };
             var result = folhaDePonto.AllocateHoursInProject(timeAllocation);
             Assert.True(result.TimeDuration == timeDuration);
         }
+       
+        [Theory]
+        [InlineData( 5, 4)]
+        [InlineData( 4.1, 4)]
+        [InlineData( 22,20)]
+        public void ShouldFailWhenHoursToAllocateGreaterThanHoursWorked(double hoursToAllocate, double hoursWorked)
+        {
+            BuildTimeMomentFullJourney(hoursWorked);
+
+            var timeDuration = new DateTime(1, 1, 1, 0, 0, 0).AddHours(hoursToAllocate);
+            var timeAllocation = new TimeAllocation
+            {
+                Date = defaultDateTime,
+                TimeDuration = timeDuration,
+                ProjectName = "Any Project Name",
+                UserId = testUser.Id
+            };
+
+            var exceptionCall = () => folhaDePonto.AllocateHoursInProject(timeAllocation);
+            Assert.Throws<TimeAllocationLimitException>(exceptionCall);
+        }
+       
 
         #region Auxiliar methods
+
+        private  FolhaDePontoContext CreateContext()
+        {
+            SharedDatabaseFixture sharedDatabaseFixture = new SharedDatabaseFixture();
+            var context = sharedDatabaseFixture.CreateContext();
+            return context;
+        }
+
+        private  void CreateTestUser(FolhaDePontoContext context)
+        {
+            testUser = new User { Name = "teste" };
+            context.Users.Add(testUser);
+            context.SaveChanges();
+        }
+
         private TimeMoment CreateMomenWithUser(string dateTimeStr, int userId)
         {
             return new TimeMoment
@@ -168,11 +217,9 @@ namespace FolhaDePontoTest
             return timeMomentExtra;
         }
 
-        private static IFolhaDePonto FolhaDePontoServiceArranje()
+        private static IFolhaDePonto FolhaDePontoServiceArranje(FolhaDePontoContext context)
         {
             Mock<ILogger<FolhaDePontoService>> mockLogger = new Mock<ILogger<FolhaDePontoService>>();
-            SharedDatabaseFixture sharedDatabaseFixture = new SharedDatabaseFixture();
-            var context = sharedDatabaseFixture.CreateContext();
 
             var timeMomentRepository = new TimeMomentRepository(context);
             var timeAllocationRepository= new TimeAllocationRepository(context);
@@ -185,9 +232,22 @@ namespace FolhaDePontoTest
             TimeMoment timeMoment = new TimeMoment();
             DateTime dateTime = DateTime.Parse(dateTimeStr);
             timeMoment.DateTime = dateTime;
-            timeMoment.User = new User { Name = "teste" };
+            timeMoment.UserId = this.testUser.Id;
             return timeMoment;
         }
+
+        private void BuildTimeMomentFullJourney(double hoursWorked)
+        {
+            var list = new List<TimeMoment>();
+            TimeMoment timeMomentStart = new TimeMoment { DateTime = defaultDateTime, UserId = testUser.Id };
+            list.Add(timeMomentStart);
+            list.Add(new TimeMoment { DateTime = defaultDateTime.AddHours(hoursWorked), UserId = testUser.Id });
+
+            context.TimeMoments.AddRange(list);
+            context.SaveChanges();
+        }
+
+        
         #endregion
     }
 }

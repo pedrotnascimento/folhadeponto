@@ -30,6 +30,15 @@ namespace Domain.Services
             var timeMoments = timeMomentRepository.QueryByUserIdAndDate(dayMoment.UserId, dayMoment.DateTime.Date);
             var hasAlreadyTimeMomentInHour = timeMoments.Any(x => x.DateTime.Hour == dayMoment.DateTime.Hour &&
                     x.DateTime.Minute == dayMoment.DateTime.Minute);
+            ValidateClockIn(dayMoment, timeMoments, hasAlreadyTimeMomentInHour);
+
+            timeMomentRepository.Create(dayMoment);
+            timeMoments.Add(dayMoment);
+            return timeMoments;
+        }
+
+        private void ValidateClockIn(TimeMoment dayMoment, IList<TimeMoment> timeMoments, bool hasAlreadyTimeMomentInHour)
+        {
             if (hasAlreadyTimeMomentInHour)
             {
                 throw new HourAlreadyExistsException();
@@ -54,19 +63,11 @@ namespace Domain.Services
             {
                 throw new WeekendExceptions();
             }
-
-            timeMomentRepository.Create(dayMoment);
-            timeMoments.Add(dayMoment);
-            return timeMoments;
         }
 
         public TimeAllocation AllocateHoursInProject(TimeAllocation allocation)
         {
 
-            if (allocation.Date.DayOfWeek == DayOfWeek.Sunday || allocation.Date.DayOfWeek == DayOfWeek.Saturday)
-            {
-                throw new WeekendExceptions();
-            }
             SanitizeTimeAllocation(allocation);
             ValidateAllocation(allocation);
 
@@ -92,6 +93,11 @@ namespace Domain.Services
             {
                 throw new TimeAllocationLimitException();
             }
+
+            if (allocation.Date.DayOfWeek == DayOfWeek.Sunday || allocation.Date.DayOfWeek == DayOfWeek.Saturday)
+            {
+                throw new WeekendExceptions();
+            }
         }
 
         private static void SanitizeTimeAllocation(TimeAllocation allocation)
@@ -114,7 +120,7 @@ namespace Domain.Services
 
             if(result.Count == 4)
             {
-                var dateTimeFromLunchTillEndOfTheDay  = result[2].DateTime.Subtract(result[3].DateTime);
+                var dateTimeFromLunchTillEndOfTheDay  = result[3].DateTime.Subtract(result[2].DateTime);
                 sum += dateTimeFromLunchTillEndOfTheDay.TotalHours;
             }
 
