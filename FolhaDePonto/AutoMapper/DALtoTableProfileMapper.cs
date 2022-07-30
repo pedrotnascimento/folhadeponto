@@ -10,7 +10,6 @@ namespace FolhaDePonto.AutoMapper
         public DALtoTableProfileMapper()
         {
             CreateMap<TimeMomentDAL, TimeMoment>().ReverseMap();
-            CreateMap<UserDAL, User>().ReverseMap();
             CreateMap<TimeAllocationDAL, TimeAllocation>().ReverseMap();
         }
 

@@ -29,6 +29,11 @@ namespace FolhaDePonto.AutoMapper
                 .ForMember(dest => dest.NomeProjeto, map => map.MapFrom(x => x.ProjectName))
                 .ForMember(dest => dest.Dia, map => map.MapFrom(x => x.Date));
 
+            CreateMap<TimeAllocationBR, AllocationResponseDTO>()
+                .ForMember(dest => dest.Tempo, map => map.MapFrom(x => Duration.FromDateTime(x.TimeDuration)))
+                .ForMember(dest => dest.NomeProjeto, map => map.MapFrom(x => x.ProjectName))
+                .ForMember(dest => dest.Dia, map => map.MapFrom(x => x.Date.ToShortDateString()));
+
             CreateMap<TimeAllocationBR, AllocationReportResponseDTO>()
                 .ForMember(dest => dest.NomeProjeto, map => map.MapFrom(x => x.ProjectName))
                 .ForMember(dest => dest.Tempo, map => map.MapFrom(x => Duration.FromDateTime(x.TimeDuration)));

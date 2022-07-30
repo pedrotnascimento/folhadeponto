@@ -18,7 +18,7 @@ namespace FolhaDePontoTest
     {
         private readonly DateTime defaultDateTime = new DateTime(2022, 1, 3, 0, 0, 0);
         IFolhaDePonto folhaDePonto;
-        User testUser;
+        UserBR testUser;
         FolhaDePontoContext context;
         public FolhaDePontoServiceTest()
         {
@@ -214,9 +214,7 @@ namespace FolhaDePontoTest
 
         private void CreateTestUser(FolhaDePontoContext context)
         {
-            testUser = new Repository.Tables.User { Name = "teste" };
-            context.Users.Add(testUser);
-            context.SaveChanges();
+            testUser = new UserBR { Name = "teste" };
         }
 
         private TimeMomentBR CreateMomenWithUser(string dateTimeStr, int userId)

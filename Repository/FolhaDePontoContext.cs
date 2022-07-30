@@ -6,7 +6,7 @@ namespace Repository
 
     public class FolhaDePontoContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
+        //public DbSet<User> Users { get; set; }
         public DbSet<TimeAllocation> TimeAllocations { get; set; }
         public DbSet<TimeMoment> TimeMoments { get; set; }
 
@@ -25,11 +25,8 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TimeMoment>()
-                .HasKey(p => new { p.UserId, p.DateTime });
-
-            modelBuilder.Entity<TimeAllocation>().HasKey(
-                x => new { x.UserId, x.ProjectName, x.Date });
+            modelBuilder.Entity<TimeMoment>();
+            modelBuilder.Entity<TimeAllocation>();
 
         }
 

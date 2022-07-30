@@ -1,6 +1,7 @@
 using AutoMapper;
 using BusinessRule.Interfaces;
 using BusinessRule.Services;
+using FolhaDePonto;
 using FolhaDePonto.AutoMapper;
 using FolhaDePonto.DTO;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IFolhaDePonto, FolhaDePontoService>();
 builder.Services.AddScoped<ITimeMomentRepository, TimeMomentRepository>();
 builder.Services.AddScoped<ITimeAllocationRepository, TimeAllocationRepository>();
+builder.Services.AddScoped<IAuthentication, Authentication>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

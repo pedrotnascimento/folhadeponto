@@ -40,6 +40,7 @@ namespace FolhaDePonto.Controllers
                 UserDTO userDTO = GetSignedInUser();
                 var user = mapper.Map<UserDTO, UserBR>(userDTO);
                 data.User = user;
+                data.UserId = user.Id;
                 IEnumerable<TimeMomentBR> moments = folhaDePonto.ClockIn(data);
                 RegisterResponseDTO register = mapper.Map<IEnumerable<TimeMomentBR>, RegisterResponseDTO>(moments);
                 return new OkObjectResult(register) { StatusCode = 201 };
@@ -79,8 +80,9 @@ namespace FolhaDePonto.Controllers
                 UserDTO userDTO = GetSignedInUser();
                 var user = mapper.Map<UserDTO, UserBR>(userDTO);
                 data.User = user;
+                data.UserId = user.Id;
                 TimeAllocationBR result = folhaDePonto.AllocateHoursInProject(data);
-                AllocationCreateDTO resultReturn = mapper.Map<TimeAllocationBR, AllocationCreateDTO>(result);
+                AllocationResponseDTO resultReturn = mapper.Map<TimeAllocationBR, AllocationResponseDTO>(result);
                 return new OkObjectResult(resultReturn) { StatusCode = 201 };
             }
             catch (WeekendExceptions e)
@@ -98,15 +100,12 @@ namespace FolhaDePonto.Controllers
         }
 
 
-        [HttpPost("folhas-de-ponto/{mes}")]
-        public ObjectResult FolhaDePonto([FromQuery] string month)
+        [HttpGet("folhas-de-ponto/{mes}")]
+        public ObjectResult FolhaDePonto(string mes)
         {
-
             try
             {
-                var monthDateTime = GetDateTime(month);
-
-                
+                var monthDateTime = GetDateTime(mes);
                 ReportBR reportGetDTO = new ReportBR
                 {
                     Month = monthDateTime,
@@ -114,6 +113,7 @@ namespace FolhaDePonto.Controllers
                 UserDTO userDTO = GetSignedInUser();
                 var user = mapper.Map<UserDTO, UserBR>(userDTO);
                 reportGetDTO.User = user;
+                //reportGetDTO.UserId = user.Id;
 
                 ReportDataBR? result = folhaDePonto.GetReport(reportGetDTO);
                 if (result == null)
