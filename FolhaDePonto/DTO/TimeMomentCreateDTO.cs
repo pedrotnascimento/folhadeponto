@@ -2,6 +2,6 @@
 {
     public class TimeMomentCreateDTO
     {
-        public DateTime DataHora { get; set; }
+        public string DataHora { get; set; }
     }
 }

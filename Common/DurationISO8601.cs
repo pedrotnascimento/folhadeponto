@@ -15,7 +15,15 @@
             }
 
             var parsed = System.Xml.XmlConvert.ToTimeSpan(durationStr);
-            return  DateTime.Parse(parsed.ToString());
+            return  new DateTime(parsed.Ticks);
+
+        }
+        
+        public static string FromDateTime(DateTime dateTime)
+        {
+            var timeSpan = new TimeSpan(dateTime.Ticks);
+            var durationFormatISO8601 = System.Xml.XmlConvert.ToString(timeSpan);
+            return durationFormatISO8601;
 
         }
     }
