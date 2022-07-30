@@ -1,0 +1,98 @@
+{
+	"info": {
+		"_postman_id": "4ea94c6c-8a47-4bba-a46c-cea68f4b142f",
+		"name": "Ilia",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "https://localhost:7002/v1/folhas-de-ponto/2022-07",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7002/v1/folhas-de-ponto/2022-07",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7002",
+					"path": [
+						"v1",
+						"folhas-de-ponto",
+						"2022-07"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:7002/v1/alocacoes",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"dia\": \"2022-07-29\",\r\n  \"tempo\": \"PT2H30M0S\",\r\n  \"nomeProjeto\": \"ACME Corporation\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7002/v1/alocacoes",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7002",
+					"path": [
+						"v1",
+						"alocacoes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:7002/v1/batidas",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6ImpTMVhvMU9XRGpfNTJ2YndHTmd2UU8yVnpNYyJ9.eyJhdWQiOiJlZTJkNGZiYS1hMmIwLTQ3YWMtYTE3YS00ZDRjMjQ0NjQyN2YiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vOTMzOWZiMWMtMDk0NC00ZmI5LTgwOGQtYTI3OGU1MzU5MGU1L3YyLjAiLCJpYXQiOjE2NTUyMjc5NjUsIm5iZiI6MTY1NTIyNzk2NSwiZXhwIjoxNjU1MjMyMjA0LCJhaW8iOiJBVlFBcS84VEFBQUFmMVVCaXdFcVgyWUNTbUltdDllVStycnB3bXNCYWxkYmg3REo0cWF4OTVSSFE2TnNHVDRXWTAzSjAwdHBuTkZzSDRCdHBUcHRQSEdEM1RHY0puMG13SDN1a0dsRTliekp6Q1pETGtZQWpLVT0iLCJhenAiOiJjMTM4ZTJiZi0zMDZhLTRkZTUtOWZlYS0yMDFkNzUyZGZkYjAiLCJhenBhY3IiOiIwIiwibmFtZSI6IlBlZHJvIFRoaWFnbyBkbyBOYXNjaW1lbnRvIFNhbnRvcyIsIm9pZCI6IjAwNTM3ZWQ5LTc5OTctNDMwMy04YjIzLTUxNjNiMDgwMWNkOCIsInByZWZlcnJlZF91c2VybmFtZSI6InBlZHJvLnNhbnRvc0ByYWRpeGVuZy5jb20uYnIiLCJyaCI6IjAuQVZrQUhQczVrMFFKdVUtQWphSjQ1VFdRNWJwUExlNndvcXhIb1hwTlRDUkdRbjlaQUZRLiIsInJvbGVzIjpbIjc5YzA1NzRhLTRjY2YtNDQ2YS05YjUwLTM0YWNjOWExYzU4YiIsImQ2ZGMxZjNhLWY2YjgtNGU2ZS04ZDg0LTlhM2ZiOTNlMWU5ZSJdLCJzY3AiOiJ4dHVkbyIsInN1YiI6Ims0d1pLdDgtcUp4OVgySzVmRlhEdHJJSEptR3BBNDM2aVZFeFhyU0stUVUiLCJ0aWQiOiI5MzM5ZmIxYy0wOTQ0LTRmYjktODA4ZC1hMjc4ZTUzNTkwZTUiLCJ1dGkiOiJpZm5IcHNzTGkwT3BISS1ZRUVvT0FRIiwidmVyIjoiMi4wIn0.GjAsIeZWfnAsM_sh3Ezve0kwggFjZIZv8IsohQP0IRrKtcmSt4dbloPaWWOgHvK2QSOMO1BC0_yjLQlDXiDnitSDxldzCx5l1tHpvSID6eFgYQANnSfbaPzpGtao9UKzlkFG5n40PocXdt4mVTtgkee9fh05IeJ2AgcZAe63oAVgUrbFqxyFoD7q8CAZ21fjXGWLbtsp4bwCM_3fLpTBkBAIixM4j-Ys3cWPRds9O5cR1Uv3pQbur-bwD-DZCXP_dbB9nJkypQMCvO-b5uWJ3jtbLTVL8vmtNeqmETietkMpQu4ugXa7z9ckoHlGgEhp5O8FHdgFUdZrBG3ZWs5kmg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"dataHora\": \"2022-07-29T14:00:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7002/v1/batidas",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7002",
+					"path": [
+						"v1",
+						"batidas"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
