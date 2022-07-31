@@ -10,12 +10,13 @@ using BusinessRule.Domain;
 using Repository.Tables;
 using AutoMapper;
 using FolhaDePonto.AutoMapper;
+using Common;
 
 namespace FolhaDePontoTest
 {
     public class FolhaDePontoServiceTest
     {
-        private readonly DateTime defaultDateTime = new DateTime(2022,1,3,0,0,0);
+        private readonly DateTime defaultDateTime = new DateTime(2022, 1, 3, 0, 0, 0);
         IFolhaDePonto folhaDePonto;
         User testUser;
         FolhaDePontoContext context;
@@ -128,10 +129,10 @@ namespace FolhaDePontoTest
         }
 
         [Theory]
-        [InlineData( 0.1, 4)]
-        [InlineData( 4, 4)]
-        [InlineData( 8, 8)]
-        [InlineData( 20,20)]
+        [InlineData(0.1, 4)]
+        [InlineData(4, 4)]
+        [InlineData(8, 8)]
+        [InlineData(20, 20)]
         public void ShouldCreateAllocationHoursInProject(double hoursToAllocate, double hoursWorked)
         {
             BuildTimeMomentFullJourney(hoursWorked);
@@ -147,11 +148,11 @@ namespace FolhaDePontoTest
             var result = folhaDePonto.AllocateHoursInProject(timeAllocation);
             Assert.True(result.TimeDuration == timeDuration);
         }
-       
+
         [Theory]
-        [InlineData( 5, 4)]
-        [InlineData( 4.1, 4)]
-        [InlineData( 22,20)]
+        [InlineData(5, 4)]
+        [InlineData(4.1, 4)]
+        [InlineData(22, 20)]
         public void ShouldFailWhenHoursToAllocateGreaterThanHoursWorked(double hoursToAllocate, double hoursWorked)
         {
             BuildTimeMomentFullJourney(hoursWorked);
@@ -168,18 +169,50 @@ namespace FolhaDePontoTest
             var exceptionCall = () => folhaDePonto.AllocateHoursInProject(timeAllocation);
             Assert.Throws<TimeAllocationLimitException>(exceptionCall);
         }
-       
 
-        #region Auxiliar methods
+        [Theory]
+        [InlineData(8, 8, 0, 0)]
+        public void ShouldReturnReport(double hoursToAllocate, double hoursWorkedInDay, double exceedHours, double debtHours)
+        {
+            int HOURS_WORKED_IN_DAY = 8;
+            int CLOCK_IN_IN_DAY = 2;
+            BuildTimeMomentEntireMonthGivenAnHoursByDay(hoursWorkedInDay);
+            BuildTimeAllocation(hoursToAllocate);
 
-        private  FolhaDePontoContext CreateContext()
+            var report = new ReportBR
+            {
+                Month = defaultDateTime.Date,
+                User = new UserBR { Id = testUser.Id, Name = testUser.Name }
+            };
+
+            var workDays = DateHelper.WorkDaysInAMonth(defaultDateTime);
+            ReportDataBR? reportData = folhaDePonto.GetReport(report);
+
+            var timeSpanWorkedHours = new TimeSpan(reportData.WorkedTime.Ticks);
+            var timeSpanDebtHours = new TimeSpan(reportData.DebtTime.Ticks);
+            var timeSpanExceedHours = new TimeSpan(reportData.ExceededWorkedTime.Ticks);
+            double totalWorkedHours = workDays * hoursWorkedInDay;
+
+            Assert.NotNull(reportData);
+            Assert.True(reportData.TimeAllocations.FirstOrDefault().TimeDuration.Hour == hoursToAllocate);
+            Assert.True(reportData.TimeMoments.Count() == workDays * CLOCK_IN_IN_DAY);
+            Assert.True(timeSpanWorkedHours.TotalHours == totalWorkedHours);
+            Assert.True(timeSpanDebtHours.TotalHours == debtHours);
+
+            Assert.True(timeSpanExceedHours.TotalHours == exceedHours);
+
+        }
+
+        #region Arranje Auxiliar methods
+
+        private FolhaDePontoContext CreateContext()
         {
             SharedDatabaseFixture sharedDatabaseFixture = new SharedDatabaseFixture();
             var context = sharedDatabaseFixture.CreateContext();
             return context;
         }
 
-        private  void CreateTestUser(FolhaDePontoContext context)
+        private void CreateTestUser(FolhaDePontoContext context)
         {
             testUser = new Repository.Tables.User { Name = "teste" };
             context.Users.Add(testUser);
@@ -222,7 +255,8 @@ namespace FolhaDePontoTest
         private static IFolhaDePonto FolhaDePontoServiceArranje(FolhaDePontoContext context)
         {
             Mock<ILogger<FolhaDePontoService>> mockLogger = new Mock<ILogger<FolhaDePontoService>>();
-            var mapperConfiguration = new MapperConfiguration(cfg => {
+            var mapperConfiguration = new MapperConfiguration(cfg =>
+            {
                 cfg.AddProfile(typeof(DTOtoBRProfileMapper));
                 cfg.AddProfile(typeof(BRtoDALProfileMapper));
                 cfg.AddProfile(typeof(DALtoTableProfileMapper));
@@ -230,7 +264,7 @@ namespace FolhaDePontoTest
 
             var mapper = mapperConfiguration.CreateMapper();
             var timeMomentRepository = new TimeMomentRepository(context, mapper);
-            var timeAllocationRepository= new TimeAllocationRepository(context, mapper);
+            var timeAllocationRepository = new TimeAllocationRepository(context, mapper);
             IFolhaDePonto folhaDePonto = new FolhaDePontoService(mockLogger.Object, mapper, timeMomentRepository, timeAllocationRepository);
             return folhaDePonto;
         }
@@ -255,7 +289,35 @@ namespace FolhaDePontoTest
             context.SaveChanges();
         }
 
-        
+        private void BuildTimeMomentEntireMonthGivenAnHoursByDay(double hoursWorkedByDay)
+        {
+            var list = new List<TimeMoment>();
+            var workDaysInAMonth = DateHelper.WorkDaysInAMonth(defaultDateTime.Date);
+            for (int i = 0; i < workDaysInAMonth; i++)
+            {
+                TimeMoment timeMomentStart = new TimeMoment { DateTime = defaultDateTime.AddDays(i), UserId = testUser.Id };
+                list.Add(timeMomentStart);
+                list.Add(new TimeMoment { DateTime = defaultDateTime.AddDays(i).AddHours(hoursWorkedByDay), UserId = testUser.Id });
+            }
+
+            context.TimeMoments.AddRange(list);
+            context.SaveChanges();
+        }
+
+        private void BuildTimeAllocation(double hoursToAllocate)
+        {
+            TimeAllocation timeAllocation = new TimeAllocation
+            {
+                Date = defaultDateTime,
+                ProjectName = "Any project",
+                TimeDuration = new DateTime(1, 1, 1).AddHours(hoursToAllocate),
+                UserId = testUser.Id
+            };
+
+            context.TimeAllocations.Add(timeAllocation);
+            context.SaveChanges();
+        }
+
         #endregion
     }
 }

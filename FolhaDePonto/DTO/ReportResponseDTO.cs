@@ -1,6 +1,6 @@
 ﻿using FolhaDePonto.DTO;
 
-namespace FolhaDePonto.ViewModel
+namespace FolhaDePonto.DTO
 {
     public class ReportResponseDTO
     {

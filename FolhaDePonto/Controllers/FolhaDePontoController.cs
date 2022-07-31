@@ -103,9 +103,10 @@ namespace FolhaDePonto.Controllers
                     User = new UserBR { Name = "teste" } 
                 };
                 
-                TimeAllocationBR result = folhaDePonto.GetReport(reportGetDTO);
-                AllocationCreateDTO resultReturn = mapper.Map<TimeAllocationBR, AllocationCreateDTO>(result);
-                return new OkObjectResult(resultReturn) { StatusCode = 201 };
+                ReportDataBR result = folhaDePonto.GetReport(reportGetDTO);
+                var reportResult = mapper.Map<ReportDataBR, ReportResponseDTO>(result);
+                
+                return new OkObjectResult(reportResult) { StatusCode = 201 };
             }
             catch (WeekendExceptions e)
             {

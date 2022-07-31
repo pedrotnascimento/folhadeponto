@@ -16,10 +16,10 @@ namespace Repository.Repositories
             this.mapper = mapper;
         }
 
-        public TimeAllocationDAL? GetByDate(DateTime dateTime)
+        public TimeAllocationDAL? GetByUserIdAndDate(int userId, DateTime dateTime)
         {
-            var result = this.context.TimeAllocations.FirstOrDefault(x => x.Date == dateTime);
-            var ret= mapper.Map<TimeAllocation, TimeAllocationDAL>(result);
+            var result = this.context.TimeAllocations.FirstOrDefault(x => x.UserId == userId && x.Date == dateTime);
+            var ret = mapper.Map<TimeAllocation, TimeAllocationDAL>(result);
             return ret;
         }
 
@@ -38,5 +38,18 @@ namespace Repository.Repositories
             context.SaveChanges();
         }
 
+        public List<TimeAllocationDAL> QueryByUserIdAndMonth(int id, DateTime month)
+        {
+            var result = this.context.TimeAllocations.Where(x => x.Date.Month == month.Month &&
+            x.Date.Year == month.Year && x.UserId == id)
+                .ToList();
+
+            if (result == null)
+            {
+                return new List<TimeAllocationDAL>();
+            }
+               var ret = mapper.Map<List<TimeAllocation>, List<TimeAllocationDAL>>(result);
+            return ret;
+        }
     }
 }
